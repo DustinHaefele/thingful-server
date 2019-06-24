@@ -45,6 +45,8 @@ describe('Reviews Endpoints', function() {
       }
       return supertest(app)
         .post('/api/reviews')
+        //This might be wrong
+        .set('Authorization', 'basic myAuthToken')
         .send(newReview)
         .expect(201)
         .expect(res => {
@@ -93,6 +95,8 @@ describe('Reviews Endpoints', function() {
 
         return supertest(app)
           .post('/api/reviews')
+          //This might be wrong
+          .set('Authorization', 'basic myAuthToken')
           .send(newReview)
           .expect(400, {
             error: `Missing '${field}' in request body`,

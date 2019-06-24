@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Things Endpoints', function() {
+describe('Protected Endpoints', function() {
   let db;
 
   const { testUsers, testThings, testReviews } = helpers.makeThingsFixtures();
@@ -21,15 +21,27 @@ describe('Things Endpoints', function() {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe.only('Protected Endpoints', () => {
-    beforeEach('insert things', () => {
-      return helpers.seedThingsTables(db, testUsers, testThings, testReviews);
-    });
+  beforeEach('insert things', () => {
+    return helpers.seedThingsTables(db, testUsers, testThings, testReviews);
+  });
 
-    describe('GET /api/things/:thing_id', () => {
+  const protectedEndpoints = [
+    {
+      name: 'GET /api/things/:things_id',
+      path: '/api/things/1'
+    },
+    {
+      name: 'GET /api/things/:things_id',
+      path: '/api/things/1/reviews'
+    }
+  ];
+
+  protectedEndpoints.forEach(endpoint => {
+    
+    describe(endpoint.name, () => {
       it('responds with 401 missing token when no basic token provided', () => {
         return supertest(app)
-          .get('/api/things/1')
+          .get(endpoint.path)
           .expect(401, { error: 'Missing token' });
       });
 
@@ -37,14 +49,30 @@ describe('Things Endpoints', function() {
         const missingCred = { user_name: '', password: '' };
 
         return supertest(app)
-          .get('/api/things/1')
+          .get(endpoint.path)
           .set('Authorization', helpers.makeAuthHeader(missingCred))
           .expect(401, { error: 'Unauthorized request' });
       });
 
-      it('responds 401 if user isn\'t valid', ()=>{
-        const invalidUser = {user_name: 'NotAReal', password: 'password'};
-        
+      it("responds 401 if user isn't valid", () => {
+        const invalidUser = { user_name: 'NotAReal', password: 'password' };
+
+        return supertest(app)
+          .get(endpoint.path)
+          .set('Authorization', helpers.makeAuthHeader(invalidUser))
+          .expect(401, { error: 'Unauthorized request' });
+      });
+
+      it("responds 401 Unauthorized request if password doesn't match user_name", () => {
+        const invalidPassword = {
+          user_name: testUsers[0].user_name,
+          password: 'Notarealpassword'
+        };
+
+        return supertest(app)
+          .get(endpoint.path)
+          .set('Authorization', helpers.makeAuthHeader(invalidPassword))
+          .expect(401, { error: 'Unauthorized request' });
       });
     });
   });

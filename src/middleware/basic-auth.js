@@ -1,4 +1,4 @@
-
+const knex = require('knex');
 
 function requireAuth(req,res,next) {
  
@@ -15,11 +15,23 @@ function requireAuth(req,res,next) {
     .toString()
     .split(':');
 
+
   if (!user_name || !password) {
-    return res.status(401).json({error: 'Unauthorized request'})
+    return res.status(401).json({error: 'Unauthorized request'});
   }
 
-  next();
+  req.app.get('db')('thingful_users')
+    .where({user_name})
+    .first()
+    .then(user =>{
+      if(!user || user.password !== password){
+        return res.status(401).json({error:'Unauthorized request'});
+      }
+      req.user = user;
+      next();
+    })
+    .catch(next);
+
 }
 
 module.exports = {

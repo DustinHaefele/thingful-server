@@ -14,9 +14,9 @@ describe('Reviews Endpoints', function() {
     db = knex({
       client: 'pg',
       connection: process.env.TEST_DB_URL,
-    })
-    app.set('db', db)
-  })
+    });
+    app.set('db', db);
+  });
 
   after('disconnect from db', () => db.destroy())
 
@@ -31,7 +31,7 @@ describe('Reviews Endpoints', function() {
         testUsers,
         testThings
       )
-    )
+    );
 
     it(`creates an review, responding with 201 and the new review`, function() {
       this.retries(3)

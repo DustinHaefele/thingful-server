@@ -76,4 +76,55 @@ describe('Protected Endpoints', function() {
       });
     });
   });
+  describe('POST /api/reviews', () => {
+    const postEndpoint = {path: '/api/reviews'};
+    const {
+      testThings,
+      testUsers,
+    } = helpers.makeThingsFixtures()
+    const newReview = {
+      text: 'Test new review',
+      rating: 3,
+      thing_id: testThings[0].id,
+    }
+    it('responds with 401 missing token when no basic token provided', () => {
+      return supertest(app)
+        .post(postEndpoint.path)
+        .send(newReview)
+        .expect(401, { error: 'Missing token' });
+    });
+
+    it('responds with 401 "Unauthorized request" when Credentials are missing', () => {
+      const missingCred = { user_name: '', password: '' };
+
+      return supertest(app)
+        .post(postEndpoint.path)
+        .set('Authorization', helpers.makeAuthHeader(missingCred))
+        .send(newReview)
+        .expect(401, { error: 'Unauthorized request' });
+    });
+
+    it("responds 401 if user isn't valid", () => {
+      const invalidUser = { user_name: 'NotAReal', password: 'password' };
+
+      return supertest(app)
+        .post(postEndpoint.path)
+        .set('Authorization', helpers.makeAuthHeader(invalidUser))
+        .send(newReview)
+        .expect(401, { error: 'Unauthorized request' });
+    });
+
+    it("responds 401 Unauthorized request if password doesn't match user_name", () => {
+      const invalidPassword = {
+        user_name: testUsers[0].user_name,
+        password: 'Notarealpassword'
+      };
+
+      return supertest(app)
+        .post(postEndpoint.path)
+        .set('Authorization', helpers.makeAuthHeader(invalidPassword))
+        .send(newReview)
+        .expect(401, { error: 'Unauthorized request' });
+    });
+  });
 });

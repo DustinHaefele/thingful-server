@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt')
+
 function makeUsersArray() {
   return [
     {
@@ -228,6 +230,10 @@ function cleanTables(db) {
       thingful_reviews
       RESTART IDENTITY CASCADE`
   )
+}
+
+function seedUsers(db, users) {
+  //insert seed users function here
 }
 
 function seedThingsTables(db, users, things, reviews=[]) {

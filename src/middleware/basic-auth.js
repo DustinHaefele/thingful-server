@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const knex = require('knex');
 
 function requireAuth(req,res,next) {
@@ -24,11 +25,17 @@ function requireAuth(req,res,next) {
     .where({user_name})
     .first()
     .then(user =>{
-      if(!user || user.password !== password){
+      if(!user){
         return res.status(401).json({error:'Unauthorized request'});
       }
-      req.user = user;
-      next();
+      return bcrypt.compare(password, user.password)
+        .then(theyMatch => {
+          if(!theyMatch) {
+            return res.status(401).json({error: 'Unauthorized request'});
+          }
+          req.user = user;
+          next();
+        });
     })
     .catch(next);
 

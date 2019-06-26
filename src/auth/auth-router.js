@@ -1,14 +1,12 @@
 const express = require('express');
-// const path = require('path');
 const AuthService = require('./auth-service');
-// const { requireAuth } = require('../middleware/basic-auth');
 
 const jsonBodyParser = express.json();
 
 const AuthRouter = express.Router();
 
 AuthRouter.route('/').post(jsonBodyParser, (req, res, next) => {
-  const { user_name, id, password } = req.body;
+  const { user_name, password } = req.body;
 
   if (!user_name || !password) {
     return res.status(400).json({

@@ -24,7 +24,7 @@ describe('Auth Endpoints', () => {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe.only('POST /api/login', () => {
+  describe('POST /api/login', () => {
     beforeEach('insert users', () => {
       return helpers.seedUsers(db, testUsers);
     });
@@ -71,7 +71,7 @@ describe('Auth Endpoints', () => {
             error: `Invalid Credentials`
           });
       });
-      
+
       it('responds 200 with a jwt token when valid credentials sent',()=>{
         const expectedToken = jwt.sign({user_id: testUser.id}, config.JWT_SECRET, {subject: testUser.user_name});
         return supertest(app)

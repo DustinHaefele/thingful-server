@@ -1,6 +1,8 @@
 const knex = require('knex');
 const helpers = require('./test-helpers');
 const app = require('../src/app');
+const jwt = require('jsonwebtoken');
+const config = require('../src/config');
 
 describe('Auth Endpoints', () => {
   let db;
@@ -68,6 +70,14 @@ describe('Auth Endpoints', () => {
           .expect(401, {
             error: `Invalid Credentials`
           });
+      });
+      
+      it('responds 200 with a jwt token when valid credentials sent',()=>{
+        const expectedToken = jwt.sign({user_id: testUser.id}, config.JWT_SECRET, {subject: testUser.user_name});
+        return supertest(app)
+          .post('/api/login')
+          .send({user_name: testUser.user_name, password: testUser.password})
+          .expect(200, {authToken: expectedToken});
       });
     });
   });

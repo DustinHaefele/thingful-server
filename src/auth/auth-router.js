@@ -8,8 +8,7 @@ const jsonBodyParser = express.json();
 const AuthRouter = express.Router();
 
 AuthRouter.route('/').post(jsonBodyParser, (req, res, next) => {
-  const { user_name, password } = req.body;
-  const user = { user_name, password };
+  const { user_name, id, password } = req.body;
 
   if (!user_name || !password) {
     return res.status(400).json({
@@ -17,25 +16,28 @@ AuthRouter.route('/').post(jsonBodyParser, (req, res, next) => {
     });
   }
 
-  AuthService.getUserWithUserName(req.app.get('db'), user_name).then(user => {
-    if (!user) {
-      return res.status(401).json({
-        error: `Invalid Credentials`
-      });
-    }
-
-    AuthService.verifyPassword(password, user.password).then(match => {
-      if (!match) {
+  AuthService.getUserWithUserName(req.app.get('db'), user_name)
+    .then(user => {
+      if (!user) {
         return res.status(401).json({
           error: `Invalid Credentials`
         });
       }
-      res.send('jwt token');
-    });
-  }).catch(next);
 
-  
-  
+      AuthService.verifyPassword(password, user.password).then(match => {
+        if (!match) {
+          return res.status(401).json({
+            error: `Invalid Credentials`
+          });
+        }
+        const subject = user.user_name;
+        const payload = {user_id: user.id};
+        res.send({
+          authToken: AuthService.createJwt(subject, payload)
+        });
+      });
+    })
+    .catch(next);
 });
 
 module.exports = AuthRouter;

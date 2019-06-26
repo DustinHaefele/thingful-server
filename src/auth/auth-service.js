@@ -13,11 +13,12 @@ const AuthService = {
     return bcrypt.compare(password, hashedPass);
   },
 
-  createJwt(sub, pay) {
-    return jwt.sign(pay, config.JWT_SECRET, {
-      subject: sub
+  createJwt(subject, payload) {
+    return jwt.sign(payload, config.JWT_SECRET, {
+      subject,
+      algorithm: 'HS256',
     });
-  }
+  },
 };
 
 module.exports = AuthService;

@@ -14,7 +14,6 @@ function requireAuth(req, res, next) {
   } 
 
   try {
-    console.log('decoded:', token);
     const decoded = AuthServices.verifyJwt(token);
     
     AuthServices.getUserWithUserName(req.app.get('db'), decoded.subject)
@@ -30,7 +29,7 @@ function requireAuth(req, res, next) {
         next(err);
       });
   } catch (err) {
-    res.status(401, { error: 'Unauthorized request' });
+    res.status(401).json({ error: 'Unauthorized request' });
   }
 }
 

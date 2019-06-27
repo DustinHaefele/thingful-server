@@ -1,6 +1,6 @@
 const AuthServices = require('../auth/auth-service');
 
-console.log(AuthServices);
+
 
 function requireAuth(req, res, next) {
   
@@ -16,7 +16,7 @@ function requireAuth(req, res, next) {
   try {
     const decoded = AuthServices.verifyJwt(token);
     
-    AuthServices.getUserWithUserName(req.app.get('db'), decoded.subject)
+    AuthServices.getUserWithUserName(req.app.get('db'), decoded.sub)
       .then(user => {
         if (!user) {
           return res.status(401).json({ error: 'Unauthorized request' });

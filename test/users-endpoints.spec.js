@@ -108,11 +108,12 @@ describe('USERS ENDPOINTS', () => {
           .send(newUser)
           .expect(201)
           .expect(res => {
-            //expect(res.body).to.have.property('id');
+           
+            expect(res.body).to.have.property('id');
             expect(res.body.user_name).to.eql(newUser.user_name);
             expect(res.body.full_name).to.eql(newUser.full_name);
             expect(res.body.nickname).to.eql('');
-            //expect(res.headers.location).to.eql(`/api/users/${res.body.id}`);
+            expect(res.headers.location).to.eql(`/api/users/${res.body.id}`);
           })
           .expect(() => {
 

@@ -38,11 +38,12 @@ const UsersService = {
   },
   serializedUser(user) {
     return {
+      id: user.id,
       user_name: xss(user.user_name),
       full_name: xss(user.full_name),
       password: user.password,
       nickname: xss(user.nickname),
-      id: user.id
+      
     };
   }
 };
